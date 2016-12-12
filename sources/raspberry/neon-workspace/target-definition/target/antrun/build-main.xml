@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <echo append="false" file="/jobs/genie.kura/kura-release/workspace/kura/target-definition/../distrib/build.properties">kura.build.version=201610201548</echo>
+</target>
+</project>

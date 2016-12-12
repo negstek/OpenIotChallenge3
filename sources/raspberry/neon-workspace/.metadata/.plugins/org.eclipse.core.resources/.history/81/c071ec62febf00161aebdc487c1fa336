@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Raspberry manager
+Bundle-SymbolicName: com.negstek.openiotchallenge3.raspberry
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: NEGSTEK
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.osgi.service.component;version="1.2.0",
+ org.slf4j
