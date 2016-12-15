@@ -1,0 +1,119 @@
+package com.negstek.openiotchallenge3.raspberry;
+
+import jdk.dio.gpio.GPIOPin;
+import jdk.dio.spibus.SPIDevice;
+import jdk.dio.spibus.SPIDeviceConfig;
+
+public class MCP3202 {
+	private static SPIDevice mcp3008 = null;  
+	   private static GPIOPin cs = null;  
+	   private static final int spiBusNumber = 0; // number of the bus the slave device is connected to  
+	   private static final int spiAddress = 1; // Chip Select address of the slave device on the bus  
+	   private static final int spiClockFrequency = 7500; // clock frequency of the slave device in Hz  
+	   private static final int spiClockMode = 2;   
+	   private static final int spiWordLength = 8;  
+	   private static final int spiBitOrdering = Peripheral.BIG_ENDIAN;  
+	   
+	   public static boolean connect() {  
+	     boolean isConnected = false;  
+	     try {  
+	       cs = (GPIOPin) PeripheralManager.open(18);  
+	         
+	       SPIDeviceConfig spiCfg = new SPIDeviceConfig(  
+	           spiBusNumber,   
+	           spiAddress,   
+	           spiClockFrequency,   
+	           spiClockMode,   
+	           spiWordLength,   
+	           spiBitOrdering);  
+	         
+	       cs.setValue(true);  
+	       mcp3008 = (SPIDevice) PeripheralManager.open(SPIDevice.class, spiCfg);  
+	       isConnected = true;  
+	         
+	     } catch (PeripheralNotAvailableException ex) {  
+	       ex.printStackTrace();  
+	     } catch (PeripheralNotFoundException ex) {  
+	       ex.printStackTrace();  
+	     } catch (PeripheralTypeNotSupportedException ex) {  
+	       ex.printStackTrace();  
+	     } catch (IOException ex) {  
+	       ex.printStackTrace();  
+	     } catch (PeripheralConfigInvalidException ex) {  
+	       ex.printStackTrace();  
+	     } catch (PeripheralExistsException ex) {  
+	       ex.printStackTrace();  
+	     }  
+	     return isConnected;  
+	   }  
+	   
+	   public static void disconnect() {  
+	     if (mcp3008 != null) {  
+	       try {  
+	         if (cs.isOpen()) {  
+	           cs.close();  
+	         }  
+	         if (mcp3008.isOpen()) {  
+	           mcp3008.close();  
+	         }  
+	       } catch (IOException ex) {  
+	         ex.printStackTrace();  
+	       }  
+	     }  
+	   }  
+	   
+	   public static int getTemperature() {  
+	       
+	     int readAdc = 0;  
+	     float milliVolts = 0;  
+	     float tempCelsius = 0;  
+	       
+	     try {  
+	       cs.setValue(false);  
+	       
+	       byte[] rxBuf = new byte[3];  
+	       byte[] txBuf = new byte[3];  
+	       txBuf[0] = (byte) 1;  
+	       txBuf[1] = (byte) ((8 + 0) << 4);  
+	       txBuf[2] = (byte) 0;  
+	             
+	       mcp3008.begin();  
+	       mcp3008.writeAndRead(txBuf, 0, txBuf.length, rxBuf, 0, rxBuf.length);  
+	       mcp3008.end();  
+	         
+	       cs.setValue(true);  
+	   
+	       readAdc = convUnsignedByte(rxBuf[2]);
+	       readAdc += ((rxBuf[1] & 3) << 8);  
+	          
+	       /* TMP36 Formula: Temp °C = 100*(reading in V) - 50  
+	        *   
+	        * The MCP3008 is a 10-bit ADC. That means it will read a value   
+	        * from 0 to 1023 (2^^10 = 1024 values) where 0 is the same as   
+	        * 'ground' and '1023' is the same as '3.3 volts'.   
+	       */  
+	          
+	       // Convert analog reading to millivolts  
+	       milliVolts = readAdc * (3300 / 1023);  
+	         
+	       // 10 mv per degree  
+	       tempCelsius = ((milliVolts - 100) / 10) - 40;  
+	                
+	       return (int)tempCelsius;  
+	         
+	     } catch (PeripheralNotAvailableException ex) {  
+	       ex.printStackTrace();  
+	     } catch (IOException ex) {  
+	       ex.printStackTrace();  
+	     }  
+	     return 0;  
+	   }  
+	     
+	   public static int convUnsignedByte (byte value) {  
+	     int returnValue = value;  
+	     if (value < 0) {  
+	       returnValue = 0xFF + value + 1;        
+	     }    
+	     return returnValue;  
+	   }   
+	 }

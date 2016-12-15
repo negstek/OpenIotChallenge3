@@ -1,0 +1,44 @@
+package com.negstek.openiotchallenge3.raspberry;
+
+import java.nio.ByteBuffer;
+import org.slf4j.Logger;
+
+import jdk.dio.Device;
+import jdk.dio.DeviceManager;
+import jdk.dio.spibus.SPIDevice;
+import jdk.dio.spibus.SPIDeviceConfig;
+
+public class SPIDACDemo {
+	public static void startApp(Logger sLogger, int spiDeviceId) {
+		try {
+			//SPIDevice spi = (SPIDevice) DeviceManager.open(spiDeviceId); // SPI Id
+
+			int controllerNumber = 0;
+			int address = 0;
+			int clockFrequency = 300000;
+			int clockMode = 2;
+			int wordLength = 12;
+			int bitOrdering = Device.BIG_ENDIAN;
+			SPIDeviceConfig config = new SPIDeviceConfig(controllerNumber, address, clockFrequency, clockMode, wordLength, bitOrdering);
+			//SPIDeviceConfig config = new SPIDeviceConfig(0, 0, SPIDeviceConfig.CS_ACTIVE_LOW, 30000, 3, 8, Device.BIG_ENDIAN);
+			SPIDevice spi = (SPIDevice) DeviceManager.open(config);
+			System.out.println("SPI device opened.");
+			int index = 0;
+			while (true) {
+				ByteBuffer rcvMsg = ByteBuffer.wrap(new byte[12]);
+				int resp = spi.read(rcvMsg);
+				String message = "Response: " + resp + ", Received: " + new String(rcvMsg.array());
+				System.out.println(message);
+				sLogger.info(message);
+				index++;
+				if (index > 30) break;
+				Thread.sleep(1000);
+			}
+			spi.close();
+			System.out.println("Done");
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			sLogger.error(SPIDACDemo.class.getName() + ", error:" + ex);
+		}
+	}
+}

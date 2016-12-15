@@ -1,4 +1,4 @@
-# List of external plug-in models previously loaded. Timestamp: 1481500751135
+# List of external plug-in models previously loaded. Timestamp: 1481747997120
 file:/home/negstek/OpenIotChallenge3/sources/raspberry/neon-workspace/target-definition/equinox_3.8.1/repository/plugins/org.eclipse.equinox.registry_3.5.200.v20120522-1841.jar
 file:/home/negstek/OpenIotChallenge3/sources/raspberry/neon-workspace/target-definition/equinox_3.8.1/repository/plugins/org.eclipse.kura.emulator.usb_1.0.0.jar
 file:/home/negstek/OpenIotChallenge3/sources/raspberry/neon-workspace/target-definition/equinox_3.8.1/repository/plugins/org.eclipse.kura.emulator.net_1.0.1.jar

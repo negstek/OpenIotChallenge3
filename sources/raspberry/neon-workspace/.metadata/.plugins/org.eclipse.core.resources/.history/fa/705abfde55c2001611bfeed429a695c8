@@ -1,0 +1,70 @@
+
+package com.negstek.openiotchallenge3.raspberry;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jdk.dio.DeviceManager;
+import jdk.dio.UnavailableDeviceException;
+import jdk.dio.gpio.GPIOPin;
+import jdk.dio.spibus.SPIDevice;
+
+/**
+ *
+ * @author Agus
+ */
+public class SPIDACDemo  {
+    private SPIDevice spi;
+    private GPIOPin ss_pin;    
+
+    public void startApp() {        
+        try{            
+            spi = (SPIDevice)DeviceManager.open(12); // SPI Id
+            ss_pin = (GPIOPin)DeviceManager.open(8); // SPI SS pin
+            System.out.println("SPI device opened.");
+            int index = 0;            
+            while(true){                                                 
+                System.out.println("Writing data...");                
+                // set high CS
+                ss_pin.setValue(false);                
+                // format MCP4901 8-bit 
+                // turn off LED
+                int d = 0b0011000000000000;                
+                spi.write((d & 0xff00) >> 8);
+                spi.write(d & 0xff);
+                ss_pin.setValue(true);                                                
+                Thread.sleep(3000);                                               
+                ss_pin.setValue(false);                                
+                // turn on LED
+                d = 0b0011111111110000;
+                spi.write((d & 0xff00) >> 8);
+                spi.write(d & 0xff);
+                ss_pin.setValue(true);                                 
+                Thread.sleep(3000);                                
+                ss_pin.setValue(false);				
+                // turn off LED
+                d = 0b0011000000000000;                
+                spi.write((d & 0xff00) >> 8);
+                spi.write(d & 0xff);
+                ss_pin.setValue(true);                                                
+                Thread.sleep(3000);                                        
+                index++;
+                if(index>4)
+                   break;                              
+                Thread.sleep(1000);
+            }            
+            spi.close();
+            System.out.println("Done");           
+            
+        }catch (UnavailableDeviceException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(SPIDACDemo.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(SPIDACDemo.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(SPIDACDemo.class.getName()).log(Level.SEVERE, null, ex);
+        }  
+    }
+}

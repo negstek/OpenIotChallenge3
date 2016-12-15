@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
 <fullyQualifiedTypeName name="org.slf4j.LoggerFactory"/>
-<fullyQualifiedTypeName name="org.slf4j.Logger"/>
 <fullyQualifiedTypeName name="org.osgi.service.component.ComponentContext"/>
 <fullyQualifiedTypeName name="jdk.dio.DeviceManager"/>
+<fullyQualifiedTypeName name="java.lang.String"/>
+<fullyQualifiedTypeName name="jdk.dio.spibus.SPIDeviceConfig"/>
+<fullyQualifiedTypeName name="com.negstek.openiotchallenge3.raspberry.ReazdAnalog3.Type"/>
+<fullyQualifiedTypeName name="jdk.dio.spibus.SPIDevice"/>
 <fullyQualifiedTypeName name="jdk.dio.gpio.GPIOPin"/>
+<fullyQualifiedTypeName name="java.nio.ByteBuffer"/>
+<fullyQualifiedTypeName name="com.negstek.openiotchallenge3.raspberry.SPIDACDemo"/>
+<fullyQualifiedTypeName name="java.util.logging.Logger"/>
+<fullyQualifiedTypeName name="org.slf4j.Logger"/>
+<fullyQualifiedTypeName name="jdk.dio.Device"/>
+<fullyQualifiedTypeName name="jdk.dio.DeviceConfig"/>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
 </qualifiedTypeNameHistroy>

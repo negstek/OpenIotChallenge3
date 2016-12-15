@@ -6,6 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: NEGSTEK
 Import-Package: jdk.dio;version="1.0.5",
  jdk.dio.gpio;version="1.0.5",
+ jdk.dio.spi;version="1.0.5",
+ jdk.dio.spibus;version="1.0.5",
  org.osgi.service.component;version="1.2.0",
  org.slf4j
 Service-Component: OSGI-INF/component.xml

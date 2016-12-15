@@ -1,0 +1,50 @@
+package com.negstek.openiotchallenge3.raspberry;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jdk.dio.DeviceManager;
+import jdk.dio.UnavailableDeviceException;
+import jdk.dio.gpio.GPIOPin;
+import jdk.dio.spibus.SPIDevice;
+
+public class SPIDACDemo  {  
+    public static void startApp() {        
+        try{            
+            SPIDevice spi;
+            GPIOPin ss_pin;  
+            spi = (SPIDevice)DeviceManager.open(12); // SPI Id
+            System.out.println("SPI device opened.");
+            int index = 0;            
+            while(index<30){                                                 
+                System.out.println("Writing data...");                
+                // set high CS             
+                // format MCP4901 8-bit 
+                int d = 0b0011000000000000;                
+                spi.write((d & 0xff00) >> 8);
+                spi.write(d & 0xff);         
+                d = 0b0011111111110000;
+                spi.write((d & 0xff00) >> 8);
+                spi.write(d & 0xff);                               
+                Thread.sleep(3000);       		
+                // turn off LED
+                d = 0b0011000000000000;                
+                spi.write((d & 0xff00) >> 8);
+                spi.write(d & 0xff);                                              
+                Thread.sleep(1000);                                        
+                index++;                
+            }            
+            spi.close();
+            System.out.println("Done");                
+        }catch (UnavailableDeviceException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(SPIDACDemo.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(SPIDACDemo.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(SPIDACDemo.class.getName()).log(Level.SEVERE, null, ex);
+        }  
+    }
+}

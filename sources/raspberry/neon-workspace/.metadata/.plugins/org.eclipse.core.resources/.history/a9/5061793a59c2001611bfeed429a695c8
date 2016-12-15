@@ -1,0 +1,54 @@
+package com.negstek.openiotchallenge3.raspberry;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jdk.dio.Device;
+import jdk.dio.DeviceManager;
+import jdk.dio.spibus.SPIDevice;
+import jdk.dio.spibus.SPIDeviceConfig;
+
+public class ReadAnalog2 {
+	private static final Logger s_logger = LoggerFactory.getLogger(ReadAnalog2.class);
+	private static final String APP_ID = "com.negstek.openiotchallenge3.raspberry";
+	public static SPIDevice spi = null;
+
+	int controllerNumber = 0;
+	int address = 1;
+	int clockFrequency = 300000;
+	int clockMode = 2;
+	int wordLength = 8;
+	int bitOrdering = Device.BIG_ENDIAN;
+
+	protected void activate(ComponentContext componentContext) {
+		s_logger.info("Bundle " + APP_ID + " has started!");
+		System.out.println("Starting MCP3202 App.");
+		SPIDeviceConfig config = new SPIDeviceConfig(controllerNumber, address, clockFrequency, clockMode, wordLength, bitOrdering);
+		try (	) {
+			System.out.println("SPI device opened.");
+			int i = 0;
+			while (i < 30) {
+				ByteBuffer sndBuf = ByteBuffer.wrap(new byte[] { 0x00 });
+				ByteBuffer rcvBuf = ByteBuffer.wrap(new byte[1]);
+				slave.writeAndRead(sndBuf, rcvBuf);
+				String message = "Analog to digital conversion at " + i + " is: " + rcvBuf.get(0);
+				System.out.println(message);
+				s_logger.info(message);
+				Thread.sleep(1000);
+				i++;
+			}
+
+		} catch (Exception e) {
+			s_logger.error("Read analog failed ", e);
+		}
+		s_logger.debug(APP_ID + ": This is a debug message.");
+	}
+
+	protected void deactivate(ComponentContext componentContext) {
+		s_logger.info("Bundle " + APP_ID + " has stopped!");
+	}
+}

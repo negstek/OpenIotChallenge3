@@ -1,0 +1,39 @@
+package com.negstek.openiotchallenge3.raspberry;
+
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jdk.dio.DeviceManager;
+import jdk.dio.gpio.GPIOPin;
+
+public class BlinkingLed {
+	private static final Logger s_logger = LoggerFactory.getLogger(BlinkingLed.class);
+	private static final String APP_ID = "com.negstek.openiotchallenge3.raspberry";
+	private GPIOPin mLed;
+
+	protected void activate(ComponentContext componentContext) {
+		s_logger.info("Bundle " + APP_ID + " has started!");
+		try {
+			mLed = DeviceManager.open(17);
+			mLed.setDirection(GPIOPin.OUTPUT);
+			mLed.setValue(true);
+		} catch (Exception e) {
+			s_logger.error("LED on failed ", e);
+		}
+		s_logger.info("Bundle " + APP_ID + " led started!");
+		s_logger.debug(APP_ID + ": This is a debug message.");
+	}
+
+	protected void deactivate(ComponentContext componentContext) {
+		s_logger.info("Bundle " + APP_ID + " has stopped!");
+		try {
+			mLed.setValue(false);
+			mLed.close();
+			mLed = null;
+		} catch (Exception e) {
+			s_logger.error("LED off failed ", e);
+		}
+		s_logger.info("Bundle " + APP_ID + " led stopped!");
+	}
+}

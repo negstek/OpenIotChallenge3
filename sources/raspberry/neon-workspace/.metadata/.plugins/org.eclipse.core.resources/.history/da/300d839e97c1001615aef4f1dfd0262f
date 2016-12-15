@@ -1,0 +1,55 @@
+package com.negstek.openiotchallenge3.raspberry;
+
+import java.io.IOException;
+
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jdk.dio.Device;
+import jdk.dio.DeviceManager;
+import jdk.dio.gpio.GPIOPin;
+import jdk.dio.spibus.SPIDevice;
+import jdk.dio.spibus.SPIDeviceConfig;
+import test.SpiDevice;
+
+public class ReadAnalog {
+	private static final Logger s_logger = LoggerFactory.getLogger(ReadAnalog.class);
+	private static final String APP_ID = "com.negstek.openiotchallenge3.raspberry";
+	public static SPIDevice spi = null;
+
+	protected void activate(ComponentContext componentContext) {
+		s_logger.info("Bundle " + APP_ID + " has started!");
+		System.out.println("Starting MCP3208 App.");
+		SPIDeviceConfig config = new SPIDeviceConfig(0, 0, SPIDeviceConfig.CS_ACTIVE_LOW, 8000000, 3, 8,Device.BIG_ENDIAN);
+		try {
+			SPIDevice spi = DeviceManager.open(SPIDevice.class, config);
+			//spi = SpiFactory.getInstance(SpiChannel.CS0, SpiDevice.DEFAULT_SPI_SPEED, SpiDevice.DEFAULT_SPI_MODE);
+			while (true) {
+				System.out.println(getConversionValue((short) 4)); 
+				Thread.sleep(2000);
+			}
+		} catch (Exception e) {
+			s_logger.error("Read analog failed ", e);
+		}
+		s_logger.debug(APP_ID + ": This is a debug message.");
+	}
+
+	protected void deactivate(ComponentContext componentContext) {
+		s_logger.info("Bundle " + APP_ID + " has stopped!");
+	}
+
+	public static int getConversionValue(short channel) throws IOException {
+		// first byte, with start bit ... ... third byte transmitted... don't care
+		byte data[] = new byte[] { (byte) 0b00000000, (byte) ((byte) channel << 6), (byte) 0b00000000 };
+		if (channel > 3) data[0] = 0B00000111; // First Byte for Channel 3-7
+		else
+			data[0] = 0B00000110;// First Byte for Channel 0-3
+		byte[] result = spi.write(data); // Request data from MCP3208 via SPI
+		int value = (result[1] << 8) & 0b0000111111111111; // merge data[1] &
+															// data[2] to get
+															// 10-bit result
+		value |= (result[2] & 0xff);
+		return value;
+	}
+}

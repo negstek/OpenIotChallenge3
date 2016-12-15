@@ -1,0 +1,33 @@
+package com.negstek.openiotchallenge3.raspberry;
+
+import java.nio.ByteBuffer;
+import org.slf4j.Logger;
+import jdk.dio.DeviceManager;
+import jdk.dio.spibus.SPIDevice;
+
+public class SPIDACDemo {
+	public static void startApp(Logger sLogger) {
+		try {
+			SPIDevice spi = (SPIDevice) DeviceManager.open(12); // SPI Id
+			System.out.println("SPI device opened.");
+			int index = 0;
+			// hello (ASCII)
+			byte[] bytes = new byte[] { (byte) 0x68, (byte) 0x65, (byte) 0x6c, (byte) 0x6c, (byte) 0x6f };
+			while (true) {
+				ByteBuffer rcvMsg = ByteBuffer.wrap(new byte[5]);
+				int resp = spi.read(rcvMsg);
+				String message = "Response: " + resp + ", Received: " + new String(rcvMsg.array());
+				System.out.println(message);
+				sLogger.info(message);
+				index++;
+				if (index > 30) break;
+				Thread.sleep(1000);
+			}
+			spi.close();
+			System.out.println("Done");
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			sLogger.error(SPIDACDemo.class.getName() + ", error:" + ex);
+		}
+	}
+}
